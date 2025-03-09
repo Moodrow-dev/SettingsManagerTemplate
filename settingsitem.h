@@ -1,9 +1,12 @@
+// settingsitem.h
 #ifndef SETTINGSITEM_H
 #define SETTINGSITEM_H
 
 #include <QVariant>
 #include <QString>
 #include "settingscontrolfactory.h"
+
+class QHBoxLayout; // Форвард-декларация, чтобы не включать лишние заголовки
 
 class SettingsItem {
 public:
@@ -17,12 +20,15 @@ public:
     QString description() const;
     SettingsControlFactory* factory() const;
 
+    // Новый метод для создания макета элемента
+    QHBoxLayout* createWidget() const;
+
 private:
-    QString name_;              // Название настройки
-    QString id_;                // Идентификатор
-    QVariant defaultValue_;     // Значение по умолчанию (может быть строкой, числом, булевым значением)
-    QString description_;       // Описание или подсказка
-    SettingsControlFactory* factory_; // Указатель на фабрику
+    QString name_;
+    QString id_;
+    QVariant defaultValue_;
+    QString description_;
+    SettingsControlFactory* factory_;
 };
 
-#endif
+#endif // SETTINGSITEM_H
