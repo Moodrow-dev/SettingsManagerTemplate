@@ -11,9 +11,9 @@
 #include <QLabel>
 #include <QWidget>
 
-SettingsItem::SettingsItem(const QString& name, const QString& id, const QVariant& defaultValue,
+SettingsItem::SettingsItem(const QString& name, const QString& id,
                            const QString& description, SettingsControlFactory* factory)
-    : name_(name), id_(id), defaultValue_(defaultValue), description_(description), factory_(factory) {}
+    : name_(name), id_(id), description_(description), factory_(factory) {}
 
 SettingsItem::~SettingsItem() {
     delete factory_;
@@ -25,10 +25,6 @@ QString SettingsItem::name() const {
 
 QString SettingsItem::id() const {
     return id_;
-}
-
-QVariant SettingsItem::defaultValue() const {
-    return defaultValue_;
 }
 
 QString SettingsItem::description() const {
@@ -50,14 +46,6 @@ QHBoxLayout* SettingsItem::createWidget() const {
     leftLayout->addWidget(hintLabel);
 
     QWidget* control = factory_->create();
-
-    if (QComboBox* comboBox = qobject_cast<QComboBox*>(control)) {
-        comboBox->setCurrentText(defaultValue_.toString());
-    } else if (QCheckBox* checkBox = qobject_cast<QCheckBox*>(control)) {
-        checkBox->setChecked(defaultValue_.toBool());
-    } else if (QSpinBox* spinBox = qobject_cast<QSpinBox*>(control)) {
-        spinBox->setValue(defaultValue_.toInt());
-    }
 
     rowLayout->addLayout(leftLayout);
     rowLayout->addWidget(control, 1);

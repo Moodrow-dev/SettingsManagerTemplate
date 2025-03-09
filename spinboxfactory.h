@@ -6,10 +6,11 @@
 
 class SpinBoxFactory : public SettingsControlFactory {
 public:
-    SpinBoxFactory(int numFrom, int numTo);
+    SpinBoxFactory(const int defaultValue, const int numFrom, const int numTo);
     QWidget* create() const override;
 
 private:
+    int defaultValue_;
     int numFrom_;
     int numTo_;
 };

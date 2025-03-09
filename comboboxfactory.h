@@ -7,9 +7,10 @@
 
 class ComboBoxFactory : public SettingsControlFactory {
 public:
-    ComboBoxFactory(const QStringList& options);
+    ComboBoxFactory(const QString& defaultValue, const QStringList& options);
     QWidget* create() const override;
 private:
+    QString defaultValue_;
     QStringList options_;
 };
 

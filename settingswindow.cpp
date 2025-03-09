@@ -11,12 +11,12 @@ SettingsWindow::SettingsWindow(QWidget* parent) : QWidget(parent) {
 
     // Пример списка настроек
     QList<SettingsItem*> items;
-    items << new SettingsItem("Language", "1", "English", "Select interface language",
-                              new ComboBoxFactory(QStringList() << "English" << "Russian"));
-    items << new SettingsItem("Autostart", "2", true, "Run on system start",
-                              new CheckBoxFactory());
-    items << new SettingsItem("Timeout", "3", 300, "Request timeout",
-                              new SpinBoxFactory(100,10000));
+    items << new SettingsItem("Language", "1", "Select interface language",
+                              new ComboBoxFactory("English",QStringList() << "English" << "Russian"));
+    items << new SettingsItem("Autostart", "2", "Run on system start",
+                              new CheckBoxFactory(true));
+    items << new SettingsItem("Timeout", "3", "Request timeout",
+                              new SpinBoxFactory(300,100,10000));
 
     // Добавляем макеты от каждого SettingsItem
     for (SettingsItem* item : std::as_const(items)) {

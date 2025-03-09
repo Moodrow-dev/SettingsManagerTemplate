@@ -10,13 +10,12 @@ class QHBoxLayout; // Форвард-декларация, чтобы не вк�
 
 class SettingsItem {
 public:
-    SettingsItem(const QString& name, const QString& id, const QVariant& defaultValue,
+    SettingsItem(const QString& name, const QString& id,
                  const QString& description, SettingsControlFactory* factory);
     ~SettingsItem();
 
     QString name() const;
     QString id() const;
-    QVariant defaultValue() const;
     QString description() const;
     SettingsControlFactory* factory() const;
 
@@ -26,7 +25,6 @@ public:
 private:
     QString name_;
     QString id_;
-    QVariant defaultValue_;
     QString description_;
     SettingsControlFactory* factory_;
 };
