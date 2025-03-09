@@ -1,3 +1,4 @@
+// spinboxfactory.h
 #ifndef SPINBOXFACTORY_H
 #define SPINBOXFACTORY_H
 
@@ -5,7 +6,12 @@
 
 class SpinBoxFactory : public SettingsControlFactory {
 public:
+    SpinBoxFactory(int numFrom, int numTo);
     QWidget* create() const override;
+
+private:
+    int numFrom_;
+    int numTo_;
 };
 
-#endif
+#endif // SPINBOXFACTORY_H

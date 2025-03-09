@@ -16,7 +16,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) : QWidget(parent) {
     items << new SettingsItem("Autostart", "2", true, "Run on system start",
                               new CheckBoxFactory());
     items << new SettingsItem("Timeout", "3", 300, "Request timeout",
-                              new SpinBoxFactory());
+                              new SpinBoxFactory(100,10000));
 
     // Добавляем макеты от каждого SettingsItem
     for (SettingsItem* item : std::as_const(items)) {

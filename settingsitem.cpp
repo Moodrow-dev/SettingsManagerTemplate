@@ -56,7 +56,6 @@ QHBoxLayout* SettingsItem::createWidget() const {
     } else if (QCheckBox* checkBox = qobject_cast<QCheckBox*>(control)) {
         checkBox->setChecked(defaultValue_.toBool());
     } else if (QSpinBox* spinBox = qobject_cast<QSpinBox*>(control)) {
-        spinBox->setRange(0, 1000);
         spinBox->setValue(defaultValue_.toInt());
     }
 
