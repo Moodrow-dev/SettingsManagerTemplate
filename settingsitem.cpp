@@ -1,4 +1,3 @@
-// settingsitem.cpp
 #include "settingsitem.h"
 #include <QHBoxLayout>
 #include <QComboBox>

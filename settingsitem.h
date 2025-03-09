@@ -6,7 +6,7 @@
 #include <QString>
 #include "settingscontrolfactory.h"
 
-class QHBoxLayout; // Форвард-декларация, чтобы не включать лишние заголовки
+class QHBoxLayout;
 
 class SettingsItem {
 public:
@@ -19,7 +19,6 @@ public:
     QString description() const;
     SettingsControlFactory* factory() const;
 
-    // Новый метод для создания макета элемента
     QHBoxLayout* createWidget() const;
 
 private:

@@ -20,6 +20,9 @@ add_executable(My1stProj
     spinboxfactory.h spinboxfactory.cpp
     settingswindow.h settingswindow.cpp
     settingscontrolfactory.h
+    lineeditfactory.h lineeditfactory.cpp
+    pushbuttonfactory.h pushbuttonfactory.cpp
+    filebrowsefactory.h filebrowsefactory.cpp
 )
 
 # Link Qt6 libraries
