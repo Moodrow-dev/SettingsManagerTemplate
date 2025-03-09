@@ -1,10 +1,9 @@
-#include "mywindow.h"
 #include <QApplication>
+#include "settingswindow.h"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-    MyWindow window;
+    SettingsWindow window;
     window.show();
     return app.exec();
 }

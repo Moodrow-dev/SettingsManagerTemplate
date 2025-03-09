@@ -11,8 +11,15 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 # Add the executable
 add_executable(My1stProj
     main.cpp
-    mywindow.cpp
-    mywindow.h
+
+
+    settingsitem.h settingsitem.cpp
+
+    comboboxfactory.h comboboxfactory.cpp
+    checkboxfactory.h checkboxfactory.cpp
+    spinboxfactory.h spinboxfactory.cpp
+    settingswindow.h settingswindow.cpp
+    settingscontrolfactory.h
 )
 
 # Link Qt6 libraries
