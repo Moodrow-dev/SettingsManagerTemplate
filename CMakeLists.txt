@@ -23,6 +23,8 @@ add_executable(My1stProj
     lineeditfactory.h lineeditfactory.cpp
     pushbuttonfactory.h pushbuttonfactory.cpp
     filebrowsefactory.h filebrowsefactory.cpp
+    colordialogfactory.h colordialogfactory.cpp
+
 )
 
 # Link Qt6 libraries

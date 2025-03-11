@@ -6,6 +6,7 @@
 #include "lineeditfactory.h"
 #include "pushbuttonfactory.h"
 #include "filebrowsefactory.h"
+#include "colordialogfactory.h"
 #include <QVBoxLayout>
 #include <QTabWidget>
 #include <QComboBox>
@@ -33,6 +34,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) : QWidget(parent) {
                               new FileBrowseFactory(new LineEditFactory("D:/storage"),
                                                     new PushButtonFactory("Browse...")),
                               true, "Template");
+    items << new SettingsItem("Color", "6", "Just a color widget", new ColorDialogFactory(new LineEditFactory("#00000000"), new PushButtonFactory("Choose")),true,"Color");
 
     QStringList groups = {};
 
@@ -114,8 +116,8 @@ void SettingsWindow::loadSettings() {
                 spinBox->setValue(value.toInt());
             } else if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(item->controlWidget())) {
                 lineEdit->setText(value.toString());
-            } else if (QWidget* fileBrowse = item->controlWidget()) {
-                QLineEdit* lineEdit = fileBrowse->findChild<QLineEdit*>();
+            } else if (QWidget* compositeWidget = item->controlWidget()) {
+                QLineEdit* lineEdit = compositeWidget->findChild<QLineEdit*>();
                 if (lineEdit) {
                     lineEdit->setText(value.toString());
                 }

@@ -1,5 +1,5 @@
 #include "filebrowsefactory.h"
-#include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QWidget>
 #include <QFileDialog>
 #include <QDir>
@@ -9,7 +9,7 @@ FileBrowseFactory::FileBrowseFactory(LineEditFactory* lineEdit, PushButtonFactor
 
 QWidget* FileBrowseFactory::create() const {
     QWidget* container = new QWidget();
-    QVBoxLayout* layout = new QVBoxLayout(container);
+    QHBoxLayout* layout = new QHBoxLayout(container);
 
     lineEditWidget_ = qobject_cast<QLineEdit*>(lineEdit_->create());
     pushButtonWidget_ = qobject_cast<QPushButton*>(pushButton_->create());
