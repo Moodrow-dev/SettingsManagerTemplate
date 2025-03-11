@@ -8,69 +8,68 @@
 #include "filebrowsefactory.h"
 #include <QVBoxLayout>
 #include <QTabWidget>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QSpinBox>
 #include <QSettings>
-#include <QLabel>
+#include <QMap>
 
 SettingsWindow::SettingsWindow(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     QTabWidget* tabWidget = new QTabWidget(this);
 
-    // Создание элементов для первой вкладки
-    mainTabItems << new SettingsItem("Language", "1", "Select interface language",
-                                  new ComboBoxFactory("English", QStringList() << "English" << "Russian"));
-    mainTabItems << new SettingsItem("Autostart", "2", "Run on system start",
-                                  new CheckBoxFactory(true));
-    mainTabItems << new SettingsItem("Timeout", "3", "Request timeout",
-                                  new SpinBoxFactory(300, 100, 10000));
+    // Теперь с указанием группы и флага сохранения
+    items << new SettingsItem("Language", "1", "Select interface language",
+                              new ComboBoxFactory("English", QStringList() << "English" << "Russian"),
+                              true, "Main");
+    items << new SettingsItem("Autostart", "2", "Run on system start",
+                              new CheckBoxFactory(true), true, "Main");
+    items << new SettingsItem("Timeout", "3", "Request timeout",
+                              new SpinBoxFactory(300, 100, 10000), true, "Main");
+    items << new SettingsItem("Template", "4", "Template of files searching",
+                              new LineEditFactory("*.png"), true, "Template");
+    items << new SettingsItem("Storage", "5", "Storage file path",
+                              new FileBrowseFactory(new LineEditFactory("D:/storage"),
+                                                    new PushButtonFactory("Browse...")),
+                              true, "Template");
 
-    // Создание элементов для второй вкладки
-    templateTabItems << new SettingsItem("Template", "4", "Template of files searching",
-                                  new LineEditFactory("*.png"));
-    templateTabItems << new SettingsItem("Storage", "5", "Storage file path",
-                                  new FileBrowseFactory(new LineEditFactory("D:/storage"),
-                                                        new PushButtonFactory("Browse...")));
+    // Организация элементов по группам (вкладкам)
+    QMap<QString, QWidget*> tabMap;
+    QMap<QString, QVBoxLayout*> layoutMap;
 
-    // Создание первой вкладки
-    QWidget* mainTab = new QWidget();
-    QVBoxLayout* mainTabLayout = new QVBoxLayout(mainTab);
-    for (SettingsItem* item : std::as_const(mainTabItems)) {
-        mainTabLayout->addLayout(item->createWidget());
+    for (SettingsItem* item : std::as_const(items)) {
+        QString groupName = item->groupName();
+        if (!tabMap.contains(groupName)) {
+            QWidget* tab = new QWidget();
+            QVBoxLayout* layout = new QVBoxLayout(tab);
+            tabMap[groupName] = tab;
+            layoutMap[groupName] = layout;
+            tabWidget->addTab(tab, groupName);
+        }
+
+        layoutMap[groupName]->addLayout(item->createWidget());
     }
 
-    // Создание второй вкладки
-    QWidget* storageTab = new QWidget();
-    QVBoxLayout* storageTabLayout = new QVBoxLayout(storageTab);
-    for (SettingsItem* item : std::as_const(templateTabItems)) {
-        storageTabLayout->addLayout(item->createWidget());
-    }
-
-    // Добавление вкладок в QTabWidget
-    tabWidget->addTab(mainTab, "General");
-    tabWidget->addTab(storageTab, "Storage");
-
-    // Основной макет окна
     mainLayout->addWidget(tabWidget);
     setLayout(mainLayout);
 
-    // Загрузка сохранённых настроек
-    loadSettings();
-
-    // Подключение автоматического сохранения при изменении значений
-    connectSignalsForAutoSave();
+    loadSettings(); // Загрузка настроек
+    connectSignalsForAutoSave(); // Подключение сигналов для автосохранения(ну по факту сохранение при изменении настроек)
 
     setWindowTitle("Settings Window");
 }
 
 SettingsWindow::~SettingsWindow() {
-    qDeleteAll(mainTabItems);
-    qDeleteAll(templateTabItems);
+    qDeleteAll(items);
 }
 
 void SettingsWindow::loadSettings() {
     QSettings settings("TestLabs", "TestSettings");
 
-    settings.beginGroup("Main");
-    for (SettingsItem* item : mainTabItems) {
+    for (SettingsItem* item : std::as_const(items)) {
+        if (!item->isSavingEnabled()) continue;
+
+        settings.beginGroup(item->groupName());
         QVariant value = settings.value(item->id(), item->getValue());
         if (value.isValid()) {
             if (QComboBox* comboBox = item->comboBox()) {
@@ -79,16 +78,7 @@ void SettingsWindow::loadSettings() {
                 checkBox->setChecked(value.toBool());
             } else if (QSpinBox* spinBox = item->spinBox()) {
                 spinBox->setValue(value.toInt());
-            }
-        }
-    }
-    settings.endGroup();
-
-    settings.beginGroup("Template");
-    for (SettingsItem* item : templateTabItems) {
-        QVariant value = settings.value(item->id(), item->getValue());
-        if (value.isValid()) {
-            if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(item->controlWidget())) {
+            } else if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(item->controlWidget())) {
                 lineEdit->setText(value.toString());
             } else if (QWidget* fileBrowse = item->controlWidget()) {
                 QLineEdit* lineEdit = fileBrowse->findChild<QLineEdit*>();
@@ -97,28 +87,26 @@ void SettingsWindow::loadSettings() {
                 }
             }
         }
+        settings.endGroup();
     }
-    settings.endGroup();
 }
 
 void SettingsWindow::saveSettings() {
     QSettings settings("TestLabs", "TestSettings");
 
-    settings.beginGroup("Main");
-    for (SettingsItem* item : mainTabItems) {
-        settings.setValue(item->id(), item->getValue());
-    }
-    settings.endGroup();
+    for (SettingsItem* item : std::as_const(items)) {
+        if (!item->isSavingEnabled()) continue;
 
-    settings.beginGroup("Template");
-    for (SettingsItem* item : templateTabItems) {
+        settings.beginGroup(item->groupName());
         settings.setValue(item->id(), item->getValue());
+        settings.endGroup();
     }
-    settings.endGroup();
 }
 
 void SettingsWindow::connectSignalsForAutoSave() {
-    for (SettingsItem* item : mainTabItems) {
+    for (SettingsItem* item : std::as_const(items)) {
+        if (!item->isSavingEnabled()) continue;
+
         if (QComboBox* comboBox = item->comboBox()) {
             connect(comboBox, QOverload<const QString&>::of(&QComboBox::currentTextChanged),
                     [this]() { saveSettings(); });
@@ -126,11 +114,7 @@ void SettingsWindow::connectSignalsForAutoSave() {
             connect(checkBox, &QCheckBox::toggled, [this]() { saveSettings(); });
         } else if (QSpinBox* spinBox = item->spinBox()) {
             connect(spinBox, QOverload<int>::of(&QSpinBox::valueChanged), [this]() { saveSettings(); });
-        }
-    }
-
-    for (SettingsItem* item : templateTabItems) {
-        if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(item->controlWidget())) {
+        } else if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(item->controlWidget())) {
             connect(lineEdit, &QLineEdit::textChanged, [this]() { saveSettings(); });
         } else if (QWidget* fileBrowse = item->controlWidget()) {
             QLineEdit* lineEdit = fileBrowse->findChild<QLineEdit*>();

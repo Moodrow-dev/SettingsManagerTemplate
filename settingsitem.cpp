@@ -2,14 +2,16 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QSpinBox>
-#include <QLineEdit>
 
 SettingsItem::SettingsItem(const QString& name, const QString& id,
-                           const QString& description, SettingsControlFactory* factory)
-    : name_(name), id_(id), description_(description), factory_(factory), controlWidget_(nullptr) {}
+                           const QString& description, SettingsControlFactory* factory,
+                           bool enableSaving, const QString& groupName)
+    : name_(name), id_(id), description_(description), factory_(factory),
+    controlWidget_(nullptr), enableSaving_(enableSaving), groupName_(groupName) {}
 
 SettingsItem::~SettingsItem() {
     delete factory_;
@@ -67,15 +69,23 @@ QVariant SettingsItem::getValue() const {
     } else if (QSpinBox* spinBox = qobject_cast<QSpinBox*>(controlWidget_)) {
         return spinBox->value();
     } else if (QWidget* fileBrowse = qobject_cast<QWidget*>(controlWidget_)) {
-        // Если это контейнер из FileBrowseFactory, ищем QLineEdit внутри
         QLineEdit* lineEdit = fileBrowse->findChild<QLineEdit*>();
         if (lineEdit) {
             return lineEdit->text();
         }
     }
-    // Если тип не поддерживается
+
     return QVariant();
 }
+
+bool SettingsItem::isSavingEnabled() const {
+    return enableSaving_;
+}
+
+QString SettingsItem::groupName() const {
+    return groupName_;
+}
+
 QComboBox* SettingsItem::comboBox() const {
     return qobject_cast<QComboBox*>(controlWidget_);
 }

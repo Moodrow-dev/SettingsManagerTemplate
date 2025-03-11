@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "settingsitem.h"
 #include <QList>
+#include <QMap>
 
 class SettingsWindow : public QWidget {
     Q_OBJECT
@@ -17,8 +18,7 @@ private:
     void saveSettings();
     void connectSignalsForAutoSave();
 
-    QList<SettingsItem*> mainTabItems;
-    QList<SettingsItem*> templateTabItems;
+    QList<SettingsItem*> items; // Список всех элементов
 };
 
-#endif
+#endif // SETTINGSWINDOW_H
