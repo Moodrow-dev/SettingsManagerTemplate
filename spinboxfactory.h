@@ -1,4 +1,3 @@
-// spinboxfactory.h
 #ifndef SPINBOXFACTORY_H
 #define SPINBOXFACTORY_H
 
@@ -15,4 +14,4 @@ private:
     int numTo_;
 };
 
-#endif // SPINBOXFACTORY_H
+#endif

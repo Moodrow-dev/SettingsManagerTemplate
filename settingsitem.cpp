@@ -13,7 +13,7 @@ SettingsItem::SettingsItem(const QString& name, const QString& id,
 
 SettingsItem::~SettingsItem() {
     delete factory_;
-    delete controlWidget_; // Удаляем виджет, если он был создан
+    delete controlWidget_;
 }
 
 QString SettingsItem::name() const {
@@ -42,7 +42,7 @@ QHBoxLayout* SettingsItem::createWidget() const {
     leftLayout->addWidget(nameLabel);
     leftLayout->addWidget(hintLabel);
 
-    controlWidget_ = factory_->create(); // Сохраняем виджет
+    controlWidget_ = factory_->create();
     rowLayout->addLayout(leftLayout);
     rowLayout->addWidget(controlWidget_, 1);
 
@@ -58,11 +58,10 @@ QVariant SettingsItem::getValue() const {
         return QVariant();
     }
 
-    // Проверяем тип виджета и извлекаем значение
     if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(controlWidget_)) {
         return lineEdit->text();
     } else if (QComboBox* comboBox = qobject_cast<QComboBox*>(controlWidget_)) {
-        return comboBox->currentText(); // или currentIndex() в зависимости от требований
+        return comboBox->currentText();
     } else if (QCheckBox* checkBox = qobject_cast<QCheckBox*>(controlWidget_)) {
         return checkBox->isChecked();
     } else if (QSpinBox* spinBox = qobject_cast<QSpinBox*>(controlWidget_)) {
@@ -74,7 +73,6 @@ QVariant SettingsItem::getValue() const {
             return lineEdit->text();
         }
     }
-
     // Если тип не поддерживается
     return QVariant();
 }

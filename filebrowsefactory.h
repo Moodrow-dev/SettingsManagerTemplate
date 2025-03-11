@@ -22,4 +22,4 @@ private:
     mutable QPushButton* pushButtonWidget_;
 };
 
-#endif // FILEBROWSEFACTORY_H
+#endif

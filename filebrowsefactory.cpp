@@ -11,7 +11,6 @@ QWidget* FileBrowseFactory::create() const {
     QWidget* container = new QWidget();
     QVBoxLayout* layout = new QVBoxLayout(container);
 
-    // Используем приведение типов
     lineEditWidget_ = qobject_cast<QLineEdit*>(lineEdit_->create());
     pushButtonWidget_ = qobject_cast<QPushButton*>(pushButton_->create());
 

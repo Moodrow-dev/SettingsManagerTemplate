@@ -1,4 +1,3 @@
-// comboboxfactory.h
 #ifndef COMBOBOXFACTORY_H
 #define COMBOBOXFACTORY_H
 
@@ -14,4 +13,4 @@ private:
     QStringList options_;
 };
 
-#endif // COMBOBOXFACTORY_H
+#endif

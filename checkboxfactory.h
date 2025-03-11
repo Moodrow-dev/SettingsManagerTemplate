@@ -1,4 +1,3 @@
-// checkboxfactory.h
 #ifndef CHECKBOXFACTORY_H
 #define CHECKBOXFACTORY_H
 
@@ -13,4 +12,4 @@ private:
 
 };
 
-#endif // CHECKBOXFACTORY_H
+#endif

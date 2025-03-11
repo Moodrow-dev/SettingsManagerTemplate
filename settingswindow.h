@@ -15,10 +15,10 @@ public:
 private:
     void loadSettings();
     void saveSettings();
-    void connectSignalsForAutoSave(); // Новое объявление
+    void connectSignalsForAutoSave();
 
-    QList<SettingsItem*> mainTabItems; // Список элементов для первой вкладки
-    QList<SettingsItem*> templateTabItems; // Список элементов для второй вкладки
+    QList<SettingsItem*> mainTabItems;
+    QList<SettingsItem*> templateTabItems;
 };
 
-#endif // SETTINGSWINDOW_H
+#endif

@@ -14,4 +14,4 @@ private:
     QString buttonText_;
 };
 
-#endif // PUSHBUTTONFACTORY_H
+#endif

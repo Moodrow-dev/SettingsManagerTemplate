@@ -13,4 +13,4 @@ private:
     QString defaultText_;
 };
 
-#endif // LINEEDITFACTORY_H
+#endif

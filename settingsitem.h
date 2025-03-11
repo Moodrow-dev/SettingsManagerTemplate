@@ -22,9 +22,8 @@ public:
     SettingsControlFactory* factory() const;;
 
     QHBoxLayout* createWidget() const;
-    QWidget* controlWidget() const; // Новый метод для доступа к виджету
+    QWidget* controlWidget() const;
 
-    // Методы для получения конкретных типов виджетов
     QComboBox* comboBox() const;
     QCheckBox* checkBox() const;
     QSpinBox* spinBox() const;
@@ -35,7 +34,7 @@ private:
     QString id_;
     QString description_;
     SettingsControlFactory* factory_;
-    mutable QWidget* controlWidget_; // Для хранения созданного виджета
+    mutable QWidget* controlWidget_;
 };
 
 #endif // SETTINGSITEM_H

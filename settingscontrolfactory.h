@@ -9,4 +9,4 @@ public:
     virtual QWidget* create() const = 0;
 };
 
-#endif // SETTINGSCONTROLFACTORY_H
+#endif
