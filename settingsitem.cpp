@@ -36,7 +36,6 @@ SettingsControlFactory* SettingsItem::factory() const {
 
 QHBoxLayout* SettingsItem::createWidget() const {
     QHBoxLayout* rowLayout = new QHBoxLayout();
-
     QVBoxLayout* leftLayout = new QVBoxLayout();
     QLabel* nameLabel = new QLabel(name_);
     QLabel* hintLabel = new QLabel(description_);

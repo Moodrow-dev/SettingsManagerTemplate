@@ -13,10 +13,11 @@
 #include <QSpinBox>
 #include <QSettings>
 #include <QMap>
+#include <QScrollArea>
+#include <QStackedWidget>
+#include <QListWidget>
 
 SettingsWindow::SettingsWindow(QWidget* parent) : QWidget(parent) {
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    QTabWidget* tabWidget = new QTabWidget(this);
 
     // Теперь с указанием группы и флага сохранения
     items << new SettingsItem("Language", "1", "Select interface language",
@@ -33,24 +34,38 @@ SettingsWindow::SettingsWindow(QWidget* parent) : QWidget(parent) {
                                                     new PushButtonFactory("Browse...")),
                               true, "Template");
 
-    // Организация элементов по группам (вкладкам)
-    QMap<QString, QWidget*> tabMap;
-    QMap<QString, QVBoxLayout*> layoutMap;
+    QStringList groups = {};
+
+    // Создаем боковую панель
+    QListWidget* sidePanel = new QListWidget(this);
+
+    // Создаем QStackedWidget для содержимого
+    QStackedWidget* stackedWidget = new QStackedWidget(this);
+
+    QMap<QString,QWidget*> pageMap;
+
+// Вот этот цикл внизу нужен для того, чтобы генерация проходила независимо от кол-ва групп настроек
 
     for (SettingsItem* item : std::as_const(items)) {
-        QString groupName = item->groupName();
-        if (!tabMap.contains(groupName)) {
-            QWidget* tab = new QWidget();
-            QVBoxLayout* layout = new QVBoxLayout(tab);
-            tabMap[groupName] = tab;
-            layoutMap[groupName] = layout;
-            tabWidget->addTab(tab, groupName);
-        }
+        QString group = item->groupName(); // Исключительно для удобства
 
-        layoutMap[groupName]->addLayout(item->createWidget());
+        if (!groups.contains(group)) {
+            groups.append(group);
+            sidePanel->addItem(group);
+
+            // Создаем QScrollArea для группы
+            QScrollArea* scrollArea = createScrollAreaForGroup(group, items); // Ну а функция тут как бы и не обязательна, но с ней код более читаемый
+            stackedWidget->addWidget(scrollArea);
+            pageMap[group] = scrollArea;
+        }
     }
 
-    mainLayout->addWidget(tabWidget);
+
+    connect(sidePanel, &QListWidget::currentRowChanged, stackedWidget, &QStackedWidget::setCurrentIndex);
+
+    QHBoxLayout* mainLayout = new QHBoxLayout(this);
+    mainLayout->addWidget(sidePanel, 1); // Боковая панель занимает 1 часть пространства
+    mainLayout->addWidget(stackedWidget, 3); // Основное содержимое занимает 3 части
     setLayout(mainLayout);
 
     loadSettings(); // Загрузка настроек
@@ -61,6 +76,25 @@ SettingsWindow::SettingsWindow(QWidget* parent) : QWidget(parent) {
 
 SettingsWindow::~SettingsWindow() {
     qDeleteAll(items);
+}
+
+QScrollArea* SettingsWindow::createScrollAreaForGroup(const QString& group, const QList<SettingsItem*>& items) {
+    QScrollArea* scrollArea = new QScrollArea();
+    scrollArea->setWidgetResizable(true);
+
+    // Создаем контейнер для содержимого
+    QWidget* contentWidget = new QWidget();
+    QVBoxLayout* layout = new QVBoxLayout(contentWidget);
+
+    // Добавляем элементы управления для группы
+    for (SettingsItem* item : std::as_const(items)) {
+        if (item->groupName() == group) {
+            layout->addLayout(item->createWidget());
+        }
+    }
+
+    scrollArea->setWidget(contentWidget);
+    return scrollArea;
 }
 
 void SettingsWindow::loadSettings() {
