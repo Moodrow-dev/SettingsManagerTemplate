@@ -1,21 +1,19 @@
 #include "settingsitem.h"
 #include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QLabel>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QSpinBox>
-#include "comboboxfactory.h"
-#include "spinboxfactory.h"
-#include "checkboxfactory.h"
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QWidget>
+#include <QLineEdit>
 
 SettingsItem::SettingsItem(const QString& name, const QString& id,
                            const QString& description, SettingsControlFactory* factory)
-    : name_(name), id_(id), description_(description), factory_(factory) {}
+    : name_(name), id_(id), description_(description), factory_(factory), controlWidget_(nullptr) {}
 
 SettingsItem::~SettingsItem() {
     delete factory_;
+    delete controlWidget_; // Удаляем виджет, если он был создан
 }
 
 QString SettingsItem::name() const {
@@ -44,10 +42,50 @@ QHBoxLayout* SettingsItem::createWidget() const {
     leftLayout->addWidget(nameLabel);
     leftLayout->addWidget(hintLabel);
 
-    QWidget* control = factory_->create();
-
+    controlWidget_ = factory_->create(); // Сохраняем виджет
     rowLayout->addLayout(leftLayout);
-    rowLayout->addWidget(control, 1);
+    rowLayout->addWidget(controlWidget_, 1);
 
     return rowLayout;
+}
+
+QWidget* SettingsItem::controlWidget() const {
+    return controlWidget_;
+}
+
+QVariant SettingsItem::getValue() const {
+    if (!controlWidget_) {
+        return QVariant();
+    }
+
+    // Проверяем тип виджета и извлекаем значение
+    if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(controlWidget_)) {
+        return lineEdit->text();
+    } else if (QComboBox* comboBox = qobject_cast<QComboBox*>(controlWidget_)) {
+        return comboBox->currentText(); // или currentIndex() в зависимости от требований
+    } else if (QCheckBox* checkBox = qobject_cast<QCheckBox*>(controlWidget_)) {
+        return checkBox->isChecked();
+    } else if (QSpinBox* spinBox = qobject_cast<QSpinBox*>(controlWidget_)) {
+        return spinBox->value();
+    } else if (QWidget* fileBrowse = qobject_cast<QWidget*>(controlWidget_)) {
+        // Если это контейнер из FileBrowseFactory, ищем QLineEdit внутри
+        QLineEdit* lineEdit = fileBrowse->findChild<QLineEdit*>();
+        if (lineEdit) {
+            return lineEdit->text();
+        }
+    }
+
+    // Если тип не поддерживается
+    return QVariant();
+}
+QComboBox* SettingsItem::comboBox() const {
+    return qobject_cast<QComboBox*>(controlWidget_);
+}
+
+QCheckBox* SettingsItem::checkBox() const {
+    return qobject_cast<QCheckBox*>(controlWidget_);
+}
+
+QSpinBox* SettingsItem::spinBox() const {
+    return qobject_cast<QSpinBox*>(controlWidget_);
 }
