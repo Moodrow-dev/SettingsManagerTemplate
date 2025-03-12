@@ -1,5 +1,0 @@
-/Users/asskiss/my1stproj/build/Desktop-Debug/CMakeFiles/My1stProj.dir
-/Users/asskiss/my1stproj/build/Desktop-Debug/CMakeFiles/edit_cache.dir
-/Users/asskiss/my1stproj/build/Desktop-Debug/CMakeFiles/rebuild_cache.dir
-/Users/asskiss/my1stproj/build/Desktop-Debug/CMakeFiles/My1stProj_autogen_timestamp_deps.dir
-/Users/asskiss/my1stproj/build/Desktop-Debug/CMakeFiles/My1stProj_autogen.dir
