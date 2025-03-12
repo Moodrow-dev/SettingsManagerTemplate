@@ -17,11 +17,6 @@ public:
     ~SettingsWindow();
 
 private:
-    void loadSettings();
-    void saveSettings();
-    void connectSignalsForAutoSave();
-    QScrollArea* createScrollAreaForGroup(const QString& group, const QList<SettingsItem*>& items);
-
     QList<SettingsItem*> items; // Список всех элементов
 };
 
