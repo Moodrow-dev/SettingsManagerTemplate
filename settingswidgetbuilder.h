@@ -1,45 +1,31 @@
 #ifndef SETTINGSWIDGETBUILDER_H
 #define SETTINGSWIDGETBUILDER_H
 
-#include <QObject>
-#include <QHBoxLayout>
-#include <QList>
-#include <QMap>
+#include <QWidget>
+#include <QHash>
+#include <QTreeWidgetItem>
 
-class SettingsItem;
+#include "settingsitem.h"
+
+class QScrollArea;
 class QTreeWidget;
-class QTreeWidgetItem;
 class QStackedWidget;
 
-class SettingsWidgetBuilder : public QObject
-{
-    Q_OBJECT
-
+class SettingsWidgetBuilder {
 public:
-    SettingsWidgetBuilder(QList<SettingsItem*> widgetList, QObject* parent = nullptr);
-    ~SettingsWidgetBuilder();
-
-    QWidget* getEmbeddedWidget() const;
+    static QWidget* buildSettingsWidget(SettingsItem* rootItem);
 
 private:
-    void setupTreeUI();
-    void buildSettingsTree(QTreeWidget* treeWidget, QStackedWidget* stackedWidget);
-    void addTreeItem(QTreeWidget* treeWidget, QStackedWidget* stackedWidget,
-                     SettingsItem* settingsItem, QTreeWidgetItem* parentTreeItem);
-    void createGroupPage(QStackedWidget* stackedWidget, SettingsItem* groupItem);
-    QString buildSettingsPath(SettingsItem* item) const;
-    void loadSettings();
-    void saveSettings();
-    void applyValueToWidget(SettingsItem* item, const QVariant& value);
-    void connectSignalsForAutoSave();
+    // ✅ КЛЮЧЕВАЯ СТРУКТУРА - связь Item <-> Page
+    using PageMap = QHash<SettingsItem*, QScrollArea*>;
 
-private slots:
-    void onTreeItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
-
-private:
-    QList<SettingsItem*> widgetList_;
-    QHBoxLayout* embedLayout_;
-    QMap<SettingsItem*, QWidget*> groupPages_;
+    static void populateTree(QTreeWidget* tree, SettingsItem* item,
+                            QTreeWidgetItem* parent, PageMap& pageMap);
+    static QScrollArea* createGroupPage(SettingsItem* group);
+    static void connectTreeToStack(QTreeWidget* tree, QStackedWidget* stack, const PageMap& pageMap);
+    static void connectAutoSave(SettingsItem* root);
+    static void loadSettings(SettingsItem* root);
+    static void applyValue(SettingsItem* item, const QVariant& value);
 };
 
-#endif // SETTINGSWIDGETBUILDER_H
+#endif
