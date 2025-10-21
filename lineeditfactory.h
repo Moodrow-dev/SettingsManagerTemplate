@@ -1,7 +1,6 @@
 #ifndef LINEEDITFACTORY_H
 #define LINEEDITFACTORY_H
 
-#include <QWidget>
 #include "settingscontrolfactory.h"
 
 class LineEditFactory : public SettingsControlFactory

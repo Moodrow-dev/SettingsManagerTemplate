@@ -2,7 +2,6 @@
 #define SETTINGSITEM_H
 
 #include "settingscontrolfactory.h"
-#include <QWidget>
 #include <QHBoxLayout>
 #include <QString>
 #include <QComboBox>

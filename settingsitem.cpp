@@ -1,6 +1,5 @@
 #include "settingsitem.h"
 #include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QComboBox>

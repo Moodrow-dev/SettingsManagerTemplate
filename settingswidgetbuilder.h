@@ -1,8 +1,6 @@
 #ifndef SETTINGSWIDGETBUILDER_H
 #define SETTINGSWIDGETBUILDER_H
 
-#include <QWidget>
-#include <QHash>
 #include <QTreeWidgetItem>
 
 #include "settingsitem.h"
@@ -16,7 +14,6 @@ public:
     static QWidget* buildSettingsWidget(SettingsItem* rootItem);
 
 private:
-    // ✅ КЛЮЧЕВАЯ СТРУКТУРА - связь Item <-> Page
     using PageMap = QHash<SettingsItem*, QScrollArea*>;
 
     static void populateTree(QTreeWidget* tree, SettingsItem* item,

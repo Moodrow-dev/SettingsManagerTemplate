@@ -1,7 +1,6 @@
 #ifndef PUSHBUTTONFACTORY_H
 #define PUSHBUTTONFACTORY_H
 
-#include <QWidget>
 #include "settingscontrolfactory.h"
 
 class PushButtonFactory : public SettingsControlFactory

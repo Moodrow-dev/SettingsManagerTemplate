@@ -5,7 +5,6 @@
 #include <QStackedWidget>
 #include <QScrollArea>
 #include <QLabel>
-#include <QVBoxLayout>
 #include <QSettings>
 #include <QDebug>
 #include <QLineEdit>

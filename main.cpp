@@ -1,6 +1,5 @@
 #include <QApplication>
 #include "settingswindow.h"
-#include <QDebug>
 
 #include "checkboxfactory.h"
 #include "colordialogfactory.h"
