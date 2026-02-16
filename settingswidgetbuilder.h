@@ -1,45 +1,43 @@
 #ifndef SETTINGSWIDGETBUILDER_H
 #define SETTINGSWIDGETBUILDER_H
 
-#include <QObject>
-#include <QHBoxLayout>
-#include <QList>
+#include <QTreeWidgetItem>
 #include <QMap>
+#include <QHash>
 
-class SettingsItem;
+#include "Settings.h"
+#include "settingsitem.h"
+
+class QScrollArea;
 class QTreeWidget;
-class QTreeWidgetItem;
 class QStackedWidget;
 
-class SettingsWidgetBuilder : public QObject
-{
-    Q_OBJECT
-
+class SettingsWidgetBuilder {
 public:
-    SettingsWidgetBuilder(QList<SettingsItem*> widgetList, QObject* parent = nullptr);
-    ~SettingsWidgetBuilder();
+    // Публичные статические методы - то, что используем из main
+    static QWidget* buildSettingsWidget(SettingsItem* rootItem, QMap<QString, QWidget*>& outWidgets,Settings* appSettings);
+    static void loadSettings(SettingsItem* root, const QMap<QString, QWidget*>& itemWidgets);
+    static void connectAutoSave(SettingsItem* root, const QMap<QString, QWidget*>& widgets);
 
-    QWidget* getEmbeddedWidget() const;
-
-private:
-    void setupTreeUI();
-    void buildSettingsTree(QTreeWidget* treeWidget, QStackedWidget* stackedWidget);
-    void addTreeItem(QTreeWidget* treeWidget, QStackedWidget* stackedWidget,
-                     SettingsItem* settingsItem, QTreeWidgetItem* parentTreeItem);
-    void createGroupPage(QStackedWidget* stackedWidget, SettingsItem* groupItem);
-    QString buildSettingsPath(SettingsItem* item) const;
-    void loadSettings();
-    void saveSettings();
-    void applyValueToWidget(SettingsItem* item, const QVariant& value);
-    void connectSignalsForAutoSave();
-
-private slots:
-    void onTreeItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
+    static void loadSettings(SettingsItem *root, const QMap<QString, QWidget *> &itemWidgets, Settings *appSettings);
 
 private:
-    QList<SettingsItem*> widgetList_;
-    QHBoxLayout* embedLayout_;
-    QMap<SettingsItem*, QWidget*> groupPages_;
+    using PageMap = QHash<SettingsItem*, QScrollArea*>;
+
+    // Приватные статические методы - только для внутреннего использования
+    static void populateTree(QTreeWidget* tree, SettingsItem* item,
+                             QTreeWidgetItem* parent, PageMap& pageMap,
+                             QMap<QString, QWidget*>& itemWidgets);
+
+    static QScrollArea* createGroupPage(SettingsItem* group, QMap<QString, QWidget*>& itemWidgets);
+
+    QWidget *buildItem(SettingsItem *item, QMap<QString, QWidget *> &outWidgets);
+
+    static void connectTreeToStack(QTreeWidget* tree, QStackedWidget* stack, const PageMap& pageMap);
+
+    static void applyValue(SettingsItem* item, QWidget* widget, const QVariant& value);
+
+    static QWidget* createSettingsRow(SettingsItem* item, QMap<QString, QWidget*>& itemWidgets);
 };
 
 #endif // SETTINGSWIDGETBUILDER_H

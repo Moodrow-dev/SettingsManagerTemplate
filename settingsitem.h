@@ -2,7 +2,6 @@
 #define SETTINGSITEM_H
 
 #include "settingscontrolfactory.h"
-#include <QWidget>
 #include <QHBoxLayout>
 #include <QString>
 #include <QComboBox>
@@ -13,11 +12,13 @@
 class SettingsItem {
 public:
     // Конструктор для обычных настроек
-    SettingsItem(SettingsItem* parent, const QString& name, const QString& id, const QString& description,
-                 SettingsControlFactory* factory, bool enableSaving = true);
+    SettingsItem(SettingsItem* parent, const QString& name, const QString& id,
+                 const QString& description, SettingsControlFactory* factory,
+                 bool enableSaving = true);
 
     // Конструктор для групп (без factory и enableSaving)
-    SettingsItem(SettingsItem* parent, const QString& name, const QString& id, const QString& description);
+    SettingsItem(SettingsItem* parent, const QString& name, const QString& id,
+                 const QString& description);
 
     ~SettingsItem();
 
@@ -30,7 +31,7 @@ public:
 
     // Группа - это элемент без родителя ИЛИ элемент без factory
     bool isGroup() const {
-        return (parent() == nullptr) || (factory() == nullptr);
+        return (parent_ == nullptr) || (factory_ == nullptr);
     }
 
     QList<SettingsItem*> getAllChildren() const;
@@ -45,26 +46,22 @@ public:
     void setValue(const QVariant& value);
     SettingsControlFactory* factory() const;
 
-    QHBoxLayout* createWidget() const;
-    QWidget* controlWidget() const;
-    QVariant getValue() const;
+    QHBoxLayout* createWidget();
+    QVariant getValueFromWidget(QWidget* controlWidget) const;  // Новый метод
+    void setValueToWidget(QWidget *controlWidget, const QVariant &value) const;
 
     bool isSavingEnabled() const;
 
-    QComboBox* comboBox() const;
-    QCheckBox* checkBox() const;
-    QSpinBox* spinBox() const;
-
 private:
-    SettingsItem* parentItem_;
+    SettingsItem* parent_;
     QList<SettingsItem*> childItems_;
     QString name_;
     QString id_;
     QString description_;
     QString value_;
     SettingsControlFactory* factory_;
-    mutable QWidget* controlWidget_;
     bool enableSaving_;
+
 };
 
 #endif // SETTINGSITEM_H

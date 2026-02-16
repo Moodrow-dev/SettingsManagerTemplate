@@ -1,4 +1,3 @@
-#include <QWidget>
 #include "settingscontrolfactory.h"
 
 class SettingsControlFactory {
