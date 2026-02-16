@@ -47,14 +47,10 @@ public:
     SettingsControlFactory* factory() const;
 
     QHBoxLayout* createWidget();
-    QWidget* getControlWidget() const;
-    QVariant getValue() const;
+    QVariant getValueFromWidget(QWidget* controlWidget) const;  // Новый метод
+    void setValueToWidget(QWidget *controlWidget, const QVariant &value) const;
 
     bool isSavingEnabled() const;
-
-    QComboBox* getComboBox() const;
-    QCheckBox* getCheckBox() const;
-    QSpinBox* getSpinBox() const;
 
 private:
     SettingsItem* parent_;
@@ -66,8 +62,6 @@ private:
     SettingsControlFactory* factory_;
     bool enableSaving_;
 
-    // Временный указатель на созданный виджет (не владеем им)
-    mutable QWidget* currentControlWidget_;
 };
 
 #endif // SETTINGSITEM_H

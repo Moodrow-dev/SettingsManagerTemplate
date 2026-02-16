@@ -1,5 +1,4 @@
 #include "settingsitem.h"
-#include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QComboBox>
@@ -11,7 +10,7 @@ SettingsItem::SettingsItem(SettingsItem* parent, const QString& name, const QStr
                            const QString& description, SettingsControlFactory* factory,
                            bool enableSaving)
     : parent_(parent), name_(name), id_(id), description_(description),
-      factory_(factory), enableSaving_(enableSaving), currentControlWidget_(nullptr)
+      factory_(factory), enableSaving_(enableSaving)
 {
     if (parent_) {
         parent_->appendChild(this);
@@ -22,7 +21,7 @@ SettingsItem::SettingsItem(SettingsItem* parent, const QString& name, const QStr
 SettingsItem::SettingsItem(SettingsItem* parent, const QString& name, const QString& id,
                            const QString& description)
     : parent_(parent), name_(name), id_(id), description_(description),
-      factory_(nullptr), enableSaving_(false), currentControlWidget_(nullptr)
+      factory_(nullptr), enableSaving_(false)
 {
     if (parent_) {
         parent_->appendChild(this);
@@ -32,7 +31,6 @@ SettingsItem::SettingsItem(SettingsItem* parent, const QString& name, const QStr
 SettingsItem::~SettingsItem() {
     delete factory_;
     qDeleteAll(childItems_);
-    // Не удаляем currentControlWidget_, так как он принадлежит layout'у
 }
 
 // Методы для древовидной структуры
@@ -127,32 +125,29 @@ QHBoxLayout* SettingsItem::createWidget() {
     leftLayout->addWidget(nameLabel);
     leftLayout->addWidget(hintLabel);
 
-    // Создаем виджет каждый раз заново
-    currentControlWidget_ = factory_->create();
+    // Создаем виджет
+    QWidget* controlWidget = factory_->create();
     rowLayout->addLayout(leftLayout);
-    rowLayout->addWidget(currentControlWidget_, 1);
+    rowLayout->addWidget(controlWidget, 1);
 
     return rowLayout;
 }
 
-QWidget* SettingsItem::getControlWidget() const {
-    return currentControlWidget_;
-}
-
-QVariant SettingsItem::getValue() const {
-    if (!currentControlWidget_ || isGroup()) {
+// Новый метод для получения значения из виджета
+QVariant SettingsItem::getValueFromWidget(QWidget* controlWidget) const {
+    if (!controlWidget || isGroup()) {
         return QVariant();
     }
 
-    if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(currentControlWidget_)) {
+    if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(controlWidget)) {
         return lineEdit->text();
-    } else if (QComboBox* comboBox = qobject_cast<QComboBox*>(currentControlWidget_)) {
+    } else if (QComboBox* comboBox = qobject_cast<QComboBox*>(controlWidget)) {
         return comboBox->currentText();
-    } else if (QCheckBox* checkBox = qobject_cast<QCheckBox*>(currentControlWidget_)) {
+    } else if (QCheckBox* checkBox = qobject_cast<QCheckBox*>(controlWidget)) {
         return checkBox->isChecked();
-    } else if (QSpinBox* spinBox = qobject_cast<QSpinBox*>(currentControlWidget_)) {
+    } else if (QSpinBox* spinBox = qobject_cast<QSpinBox*>(controlWidget)) {
         return spinBox->value();
-    } else if (QWidget* fileBrowse = qobject_cast<QWidget*>(currentControlWidget_)) {
+    } else if (QWidget* fileBrowse = qobject_cast<QWidget*>(controlWidget)) {
         QLineEdit* lineEdit = fileBrowse->findChild<QLineEdit*>();
         if (lineEdit) {
             return lineEdit->text();
@@ -166,14 +161,34 @@ bool SettingsItem::isSavingEnabled() const {
     return enableSaving_ && !isGroup();
 }
 
-QComboBox* SettingsItem::getComboBox() const {
-    return qobject_cast<QComboBox*>(currentControlWidget_);
-}
+void SettingsItem::setValueToWidget(QWidget* controlWidget, const QVariant& value) const {
+    if (!controlWidget || isGroup()) {
+        qDebug() << "⚠️ setValueToWidget: no widget or group";
+        return;
+    }
 
-QCheckBox* SettingsItem::getCheckBox() const {
-    return qobject_cast<QCheckBox*>(currentControlWidget_);
-}
+    qDebug() << "🔧 Setting value to widget:" << name() << "value:" << value;
 
-QSpinBox* SettingsItem::getSpinBox() const {
-    return qobject_cast<QSpinBox*>(currentControlWidget_);
+    if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(controlWidget)) {
+        lineEdit->setText(value.toString());
+        qDebug() << "   ✅ Set to LineEdit";
+    } else if (QComboBox* comboBox = qobject_cast<QComboBox*>(controlWidget)) {
+        int index = comboBox->findText(value.toString());
+        if (index >= 0) {
+            comboBox->setCurrentIndex(index);
+            qDebug() << "   ✅ Set to ComboBox at index" << index;
+        }
+    } else if (QCheckBox* checkBox = qobject_cast<QCheckBox*>(controlWidget)) {
+        checkBox->setChecked(value.toBool());
+        qDebug() << "   ✅ Set to CheckBox";
+    } else if (QSpinBox* spinBox = qobject_cast<QSpinBox*>(controlWidget)) {
+        spinBox->setValue(value.toInt());
+        qDebug() << "   ✅ Set to SpinBox";
+    } else {
+        QLineEdit* lineEdit = controlWidget->findChild<QLineEdit*>();
+        if (lineEdit) {
+            lineEdit->setText(value.toString());
+            qDebug() << "   ✅ Set to LineEdit (found in child)";
+        }
+    }
 }

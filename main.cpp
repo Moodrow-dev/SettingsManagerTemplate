@@ -1,5 +1,6 @@
 #include <QApplication>
 #include "settingswindow.h"
+#include "Settings.h"
 
 #include "checkboxfactory.h"
 #include "colordialogfactory.h"
@@ -46,15 +47,33 @@ SettingsItem* settingsWindowStructure() {
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
+    // СОЗДАЕМ ОБЪЕКТ НАСТРОЕК
+    Settings appSettings;
+
+    // МЕНЯЕМ ЗНАЧЕНИЯ
+    appSettings.setLanguage("Russian");
+    appSettings.setAutostart(false);
+    appSettings.setTimeout(500);
+    appSettings.setFileTemplate("*.jpg;*.png");
+    appSettings.setStoragePath("E:/MyFiles");
+    appSettings.setThemeColor("#ff0000");
+    appSettings.setFontSize(14);
+
+    // ВЫВОДИМ В КОНСОЛЬ
+    appSettings.printSettings();
+
     // 1. СТРУКТУРА
     SettingsItem* structure = settingsWindowStructure();
 
-    // 2. БИБЛИОТЕКА СТРОИТ ВИДЖЕТ
-    QWidget* settingsWidget = SettingsWidgetBuilder::buildSettingsWidget(structure);
+    // 2. СОЗДАЕМ КАРТУ ДЛЯ ВИДЖЕТОВ
+    QMap<QString, QWidget*> itemWidgets;
 
-    // 3. ПРОСТОЕ ОКНО
+    // 3. БИБЛИОТЕКА СТРОИТ ВИДЖЕТ - ТЕПЕРЬ С КАРТОЙ!
+    QWidget* settingsWidget = SettingsWidgetBuilder::buildSettingsWidget(structure, itemWidgets,&appSettings);
+
+    // 4. ПРОСТОЕ ОКНО
     SettingsWindow* window = new SettingsWindow(settingsWidget);
     window->show();
 
     return app.exec();
-}
+};

@@ -25,6 +25,8 @@ add_executable(My1stProj
     filebrowsefactory.h filebrowsefactory.cpp
     colordialogfactory.h colordialogfactory.cpp
     settingswidgetbuilder.h settingswidgetbuilder.cpp
+        Settings.cpp
+        Settings.h
 
 
 )
