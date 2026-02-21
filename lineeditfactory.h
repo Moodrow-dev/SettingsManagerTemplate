@@ -6,10 +6,10 @@
 class LineEditFactory : public SettingsControlFactory
 {
 public:
-    LineEditFactory(const QString& defaultText);
-    QWidget* create() const override;
-private:
-    QString defaultText_;
+    LineEditFactory();
+    QWidget* create(SettingsItem* settingsItem, const ControlInputCallback& contolInputCallback) const override;
+    void setValueToWidget(QWidget* widget, const QVariant& value) const override;
+    QVariant getValueFormWidget(QWidget* widget) const override;
 };
 
 #endif

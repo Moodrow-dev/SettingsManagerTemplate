@@ -11,69 +11,64 @@
 #include "settingswidgetbuilder.h"
 #include "spinboxfactory.h"
 
-SettingsItem* settingsWindowStructure() {
-    SettingsItem *rootItem = new SettingsItem(nullptr, "Settings", "root", "Application Settings");
+struct AppSettingsItems
+{
+  static SettingsItem RootItem;
 
-    SettingsItem* mainGroup = new SettingsItem(rootItem, "Main Settings", "main_group", "General application settings");
-    SettingsItem* templateGroup = new SettingsItem(rootItem, "Template Settings", "template_group", "File template settings");
-    SettingsItem* colorGroup = new SettingsItem(rootItem, "Appearance", "appearance_group", "Visual appearance settings");
+  static SettingsItem MainGroup;
+  static SettingsItem TemplateGroup;
+  static SettingsItem ColorGroup;
 
-    SettingsItem* languageItem = new SettingsItem(mainGroup, "Language", "1", "Select interface language",
-                                                  new ComboBoxFactory("English", QStringList() << "English" << "Russian" << "Spanish"), true);
+  static SettingsItem LanguageItem;
+  static SettingsItem AutostartItem;
+  static SettingsItem TimeoutItem;
 
-    SettingsItem* autostartItem = new SettingsItem(mainGroup, "Autostart", "2", "Run application on system startup",
-                                                   new CheckBoxFactory(true), true);
+  static SettingsItem FileTemplateItem;
+  static SettingsItem StorageItem;
 
-    SettingsItem* timeoutItem = new SettingsItem(mainGroup, "Timeout", "3", "Request timeout in milliseconds",
-                                                 new SpinBoxFactory(300, 100, 10000), true);
+  static SettingsItem ThemeItem;
+  static SettingsItem FontSizeItem;
+};
 
-    // Добавляем настройки в группу Template
-    SettingsItem* fileTemplateItem = new SettingsItem(templateGroup, "File Template", "4", "Template for file searching",
-                                                      new LineEditFactory("*.png"), true);
+SettingsItem AppSettingsItems::RootItem = SettingsItem("root", "Settings", "Application Settings");
+SettingsItem AppSettingsItems::MainGroup = SettingsItem("main_group", "Main Settings", "General application settings", &RootItem);
+SettingsItem AppSettingsItems::TemplateGroup = SettingsItem("template_group", "Template Settings", "File template settings", &RootItem);
+SettingsItem AppSettingsItems::ColorGroup = SettingsItem("appearance_group", "Appearance", "Visual appearance settings", &RootItem);
 
-    SettingsItem* storageItem = new SettingsItem(templateGroup, "Storage Path", "5", "Location where files will be stored",
-                                                 new FileBrowseFactory(new LineEditFactory("D:/storage"), new PushButtonFactory("Browse...")), true);
+SettingsItem AppSettingsItems::LanguageItem = SettingsItem("lang", "Language", "Select interface language", "English", &MainGroup,
+  new ComboBoxFactory(QStringList() << "English" << "Russian" << "Spanish"), true);
+SettingsItem AppSettingsItems::AutostartItem = SettingsItem("autostart", "Autostart", "Run application on system startup", true, &MainGroup,
+  new CheckBoxFactory, true);
+SettingsItem AppSettingsItems::TimeoutItem = SettingsItem("timeout", "Timeout", "Request timeout in milliseconds", 300, &MainGroup,
+  new SpinBoxFactory(100, 10000), true);
 
-    // Добавляем настройки в группу Appearance
-    SettingsItem* themeItem = new SettingsItem(colorGroup, "Theme Color", "6", "Choose application theme color",
-                                               new ColorDialogFactory(new LineEditFactory("#0078d4"), new PushButtonFactory("Choose Color")), true);
+SettingsItem AppSettingsItems::FileTemplateItem = SettingsItem("file_template", "File Template", "Template for file searching", "*.png", &TemplateGroup,
+  new LineEditFactory, true);
+SettingsItem AppSettingsItems::StorageItem = SettingsItem("storage", "Storage Path", "Location where files will be stored", "", &TemplateGroup,
+  new FileBrowseFactory, true);
 
-    SettingsItem* fontSizeItem = new SettingsItem(colorGroup, "Font Size", "7", "Application font size",
-                                                  new SpinBoxFactory(12, 8, 24), true);
-
-    return rootItem;
-}
+SettingsItem AppSettingsItems::ThemeItem = SettingsItem("theme", "Theme Color", "Choose application theme color", "#0078d4", &ColorGroup,
+  new ColorDialogFactory, true);
+SettingsItem AppSettingsItems::FontSizeItem = SettingsItem("font", "Font Size", "Application font size", 12, &ColorGroup,
+  new SpinBoxFactory(8, 24), true);
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
-    // СОЗДАЕМ ОБЪЕКТ НАСТРОЕК
-    Settings appSettings;
+    Settings appSettings("Test");
 
-    // МЕНЯЕМ ЗНАЧЕНИЯ
-    appSettings.setLanguage("Russian");
-    appSettings.setAutostart(false);
-    appSettings.setTimeout(500);
-    appSettings.setFileTemplate("*.jpg;*.png");
-    appSettings.setStoragePath("E:/MyFiles");
-    appSettings.setThemeColor("#ff0000");
-    appSettings.setFontSize(14);
+    appSettings.setValue(AppSettingsItems::LanguageItem, "Russian");
+    appSettings.setValue(AppSettingsItems::AutostartItem, false);
+    appSettings.setValue(AppSettingsItems::TimeoutItem,500);
+    appSettings.setValue(AppSettingsItems::FileTemplateItem, "*.jpg;*.png");
+    appSettings.setValue(AppSettingsItems::StorageItem, "E:/MyFiles");
+    appSettings.setValue(AppSettingsItems::ThemeItem, "#ff0000");
+    appSettings.setValue(AppSettingsItems::FontSizeItem, 14);
 
-    // ВЫВОДИМ В КОНСОЛЬ
-    appSettings.printSettings();
-
-    // 1. СТРУКТУРА
-    SettingsItem* structure = settingsWindowStructure();
-
-    // 2. СОЗДАЕМ КАРТУ ДЛЯ ВИДЖЕТОВ
-    QMap<QString, QWidget*> itemWidgets;
-
-    // 3. БИБЛИОТЕКА СТРОИТ ВИДЖЕТ - ТЕПЕРЬ С КАРТОЙ!
-    QWidget* settingsWidget = SettingsWidgetBuilder::buildSettingsWidget(structure, itemWidgets,&appSettings);
-
-    // 4. ПРОСТОЕ ОКНО
-    SettingsWindow* window = new SettingsWindow(settingsWidget);
-    window->show();
+    QWidget* settingsWidget = SettingsWidgetBuilder::buildSettingsWidget(&AppSettingsItems::RootItem, &appSettings);
+    settingsWidget->setWindowTitle("Настройки");
+    settingsWidget->setMinimumSize(700, 500);
+    settingsWidget->show();
 
     return app.exec();
 };

@@ -5,11 +5,12 @@
 
 class SpinBoxFactory : public SettingsControlFactory {
 public:
-    SpinBoxFactory(const int defaultValue, const int numFrom, const int numTo);
-    QWidget* create() const override;
+    SpinBoxFactory(const int numFrom, const int numTo);
+    QWidget* create(SettingsItem* settingsItem, const ControlInputCallback& contolInputCallback) const override;
+    void setValueToWidget(QWidget* widget, const QVariant& value) const override;
+    QVariant getValueFormWidget(QWidget* widget) const override;
 
 private:
-    int defaultValue_;
     int numFrom_;
     int numTo_;
 };
