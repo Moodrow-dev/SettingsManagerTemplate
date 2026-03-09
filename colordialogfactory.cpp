@@ -4,35 +4,33 @@
 #include <QColor>
 #include <QLabel>
 
-ColorDialogFactory::ColorDialogFactory(LineEditFactory* lineEdit, PushButtonFactory* pushButton)
-    : lineEdit_(lineEdit), pushButton_(pushButton), lineEditWidget_(nullptr), pushButtonWidget_(nullptr) {}
+ColorDialogFactory::ColorDialogFactory() {}
 
 ColorDialogFactory::~ColorDialogFactory() {
-    delete lineEditWidget_;
-    delete pushButtonWidget_;
 }
 
-QWidget* ColorDialogFactory::create() const {
+QWidget* ColorDialogFactory::create(SettingsItem* settingsItem, const ControlInputCallback& contolInputCallback) const {
     QWidget* container = new QWidget();
     QHBoxLayout* layout = new QHBoxLayout(container);
 
 
-    lineEditWidget_ = qobject_cast<QLineEdit*>(lineEdit_->create());
-    pushButtonWidget_ = qobject_cast<QPushButton*>(pushButton_->create());
+    QLineEdit* lineEdit = new QLineEdit;
+    QPushButton* pushButton = new QPushButton("Choose color...");
 
-    layout->addWidget(lineEditWidget_);
-    layout->addWidget(pushButtonWidget_);
+    layout->addWidget(lineEdit);
+    layout->addWidget(pushButton);
 
 
-    QAbstractButton::connect(pushButtonWidget_, &QPushButton::clicked, [this]() {
+    QAbstractButton::connect(pushButton, &QPushButton::clicked, pushButton, [lineEdit, settingsItem, contolInputCallback]() {
         QColorDialog dialog;
         dialog.setOptions(QColorDialog::ShowAlphaChannel); // Показываем альфа-канал
-        dialog.setCurrentColor(QColor(lineEditWidget_->text())); // Устанавливаем текущий цвет из QLineEdit
+        dialog.setCurrentColor(QColor(lineEdit->text())); // Устанавливаем текущий цвет из QLineEdit
 
         if (dialog.exec() == QColorDialog::Accepted) {
             QColor selectedColor = dialog.currentColor();
             QString colorPattern = selectedColor.name(QColor::HexArgb).toUpper(); // Получаем HEX с альфа-каналом
-            lineEditWidget_->setText(colorPattern);
+            lineEdit->setText(colorPattern);
+            contolInputCallback(settingsItem, colorPattern);
         }
     });
 
@@ -40,10 +38,21 @@ QWidget* ColorDialogFactory::create() const {
     return container;
 }
 
-QLineEdit* ColorDialogFactory::getLineEdit() const {
-    return lineEditWidget_;
+void ColorDialogFactory::setValueToWidget(QWidget* widget, const QVariant& value) const
+{
+    QLineEdit* lineEdit = widget->findChild<QLineEdit*>();
+    if (lineEdit) {
+      lineEdit->setText(value.toString());
+      qDebug() << "   ✅ Set to LineEdit (found in child)";
+    }
 }
 
-QPushButton* ColorDialogFactory::getPushButton() const {
-    return pushButtonWidget_;
+QVariant ColorDialogFactory::getValueFormWidget(QWidget* widget) const
+{
+    QLineEdit* lineEdit = widget->findChild<QLineEdit*>();
+    if (lineEdit) {
+        return lineEdit->text();
+    }
+
+    return QVariant();
 }

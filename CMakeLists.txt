@@ -21,12 +21,13 @@ add_executable(My1stProj
     settingswindow.h settingswindow.cpp
     settingscontrolfactory.h
     lineeditfactory.h lineeditfactory.cpp
-    pushbuttonfactory.h pushbuttonfactory.cpp
+
     filebrowsefactory.h filebrowsefactory.cpp
     colordialogfactory.h colordialogfactory.cpp
     settingswidgetbuilder.h settingswidgetbuilder.cpp
         Settings.cpp
         Settings.h
+        SettingsAccess.h
 
 
 )

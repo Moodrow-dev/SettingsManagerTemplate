@@ -12,13 +12,12 @@
 class SettingsItem {
 public:
     // Конструктор для обычных настроек
-    SettingsItem(SettingsItem* parent, const QString& name, const QString& id,
-                 const QString& description, SettingsControlFactory* factory,
+    SettingsItem(const QString& id, const QString& name, const QString& description, const QVariant& defaultValue,
+                 SettingsItem* parent = nullptr, SettingsControlFactory* factory = nullptr,
                  bool enableSaving = true);
 
     // Конструктор для групп (без factory и enableSaving)
-    SettingsItem(SettingsItem* parent, const QString& name, const QString& id,
-                 const QString& description);
+    SettingsItem(const QString& id, const QString& name, const QString& description, SettingsItem* parent = nullptr);
 
     ~SettingsItem();
 
@@ -42,13 +41,8 @@ public:
     QString name() const;
     QString id() const;
     QString description() const;
-    QString value() const;
-    void setValue(const QVariant& value);
+    QVariant defaultValue() const;
     SettingsControlFactory* factory() const;
-
-    QHBoxLayout* createWidget();
-    QVariant getValueFromWidget(QWidget* controlWidget) const;  // Новый метод
-    void setValueToWidget(QWidget *controlWidget, const QVariant &value) const;
 
     bool isSavingEnabled() const;
 
@@ -58,7 +52,7 @@ private:
     QString name_;
     QString id_;
     QString description_;
-    QString value_;
+    QVariant defaultValue_;
     SettingsControlFactory* factory_;
     bool enableSaving_;
 

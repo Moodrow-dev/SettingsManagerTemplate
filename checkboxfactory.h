@@ -5,11 +5,11 @@
 
 class CheckBoxFactory : public SettingsControlFactory {
 public:
-    CheckBoxFactory(const bool defaultValue);
-    QWidget* create() const override;
-private:
-    bool defaultValue_;
+    CheckBoxFactory();
 
+    QWidget* create(SettingsItem* settingsItem, const ControlInputCallback& contolInputCallback) const override;
+    void setValueToWidget(QWidget* widget, const QVariant& value) const override;
+    QVariant getValueFormWidget(QWidget* widget) const override;
 };
 
 #endif

@@ -1,52 +1,21 @@
 #ifndef MY1STPROJ_SETTINGS_H
 #define MY1STPROJ_SETTINGS_H
+
 #include <QString>
-#include <QMap>
+#include <QSettings>
 
+#include "SettingsAccess.h"
 
-class Settings {
+class Settings : public SettingsAccess
+{
 public:
-    Settings() {
-        loadFromStorage();
-    }
+    explicit Settings(const QString& organization, const QString& application = QString(), QObject *parent = nullptr);
 
-    void loadFromStorage();
-
-    void saveToStorage();
-
-    QString getLanguage() const;
-
-    bool getAutostart() const;
-
-    int getTimeout() const;
-
-    QString getFileTemplate() const;
-
-    QString getStoragePath() const;
-
-    QString getThemeColor() const;
-
-    int getFontSize() const;
-
-    void setLanguage(const QString &lang);
-
-    void setAutostart(bool autoStart);
-
-    void setTimeout(int timeout);
-
-    void setFileTemplate(const QString &templ);
-
-    void setStoragePath(const QString &path);
-
-    void setThemeColor(const QString &color);
-
-    void setFontSize(int size);
-
-    void printSettings();
+    void setValue(const SettingsItem& item, const QVariant& value) final;
+    QVariant getValue(const SettingsItem& item) const final;
 
 private:
-    QMap<QString, QVariant> m_values; // Хранилище всех настроек
+    QSettings m_settings;
 };
-
 
 #endif //MY1STPROJ_SETTINGS_H
